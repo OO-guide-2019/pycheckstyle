@@ -11,6 +11,7 @@ checkstyle原文档地址：[http://checkstyle.sourceforge.net/cmdline.html](htt
 
 * 完整的java环境（推荐使用`Oracle Java 8`）
 * 完整的python环境（推荐使用`python 3.5+`）
+* 【推荐】完整的pip3环境（推荐使用`pip3 18.0`或更高版本）
 * 相关系统依赖
 
 ### 安装jar包
@@ -28,10 +29,18 @@ sudo ./install.sh
 接下来安装`pycheckstyle`包
 
 ```bash
-sudo python3 setup.py install
+sudo pip3 install .
 ```
 
 注意：同样的，这步操作依然需要`sudo`权限
+
+类似的，卸载pycheckstyle
+
+```bash
+sudo pip3 uninstall pycheckstyle
+```
+
+在安装和卸载的过程中，推荐使用`pip`进行操作，可以省去很多不必要的麻烦。
 
 ## 开始使用
 
