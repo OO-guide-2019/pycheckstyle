@@ -1,5 +1,5 @@
 from ..config.execute import command_line_base as __command_line_base
-from ..models.exception import try_raise_execute
+from ..exceptions import try_raise_execute
 import subprocess
 
 
