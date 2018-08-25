@@ -8,12 +8,16 @@ class CheckStandard:
     检查标准类
     """
 
-    def __init__(self, standard_file):
+    def __init__(self, standard_file, ignore_return_code=False, ignore_stderr=False):
         """
         构造函数
         :param standard_file: 检查规范标准文件
+        :param ignore_return_code: 忽略非零返回值
+        :param ignore_stderr: 忽略异常输出
         """
         self.__standard_file = standard_file
+        self.__ignore_return_code = ignore_return_code
+        self.__ignore_stderr = ignore_stderr
 
     @property
     def standard_file(self):
@@ -29,7 +33,11 @@ class CheckStandard:
         :param check_dir: 检查的路径（文件）
         :return: 检查结果（list格式，内部包含CheckMessage对象）
         """
-        out, err = execute("-c", self.standard_file, check_dir)
+        out, err = execute(
+            "-c", self.standard_file, check_dir,
+            ignore_return_code=self.__ignore_return_code,
+            ignore_stderr=self.__ignore_stderr
+        )
         messages = []
         for line in out.splitlines():
             message = CheckMessage.parse(line)
@@ -59,4 +67,4 @@ class SunStandard(CheckStandard):
         """
         构造函数
         """
-        super().__init__(sun_standard)
+        super().__init__(sun_standard, ignore_return_code=True)
