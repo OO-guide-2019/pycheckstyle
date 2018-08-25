@@ -1,8 +1,5 @@
+from ..config.execute import command_line_base as __command_line_base
 import subprocess
-
-__java = "java"
-__jar_file = "/usr/lib/checkstyle/checkstyle.jar"
-__command_line_base = [__java, "-jar", __jar_file]
 
 
 def execute(*args):

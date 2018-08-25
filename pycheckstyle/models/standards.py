@@ -1,5 +1,5 @@
-from .execute import execute
-from .config.standards import google_standard, sun_standard
+from ..operation import execute
+from ..config.standards import google_standard, sun_standard
 from .message import CheckMessage
 
 
