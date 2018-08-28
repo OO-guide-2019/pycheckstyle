@@ -1,3 +1,4 @@
+import os
 import re
 
 
@@ -53,20 +54,26 @@ class CheckMessage(object):
         return self.__message
 
     @classmethod
-    def parse(cls, string):
+    def parse(cls, string, work_dir=None):
         """
         信息解析
         :param string: 原字符串
+        :param work_dir: 工作路径
         :return: 解析后的对象，解析失败返回None
         """
         groups = re.findall(cls.__parse_pattern, string)
         if groups:
             group = groups[0]
 
-            file = group[1]
+            path = group[1]
             line = int(group[2])
             column = int(group[4] or group[2])
-            position = MessagePosition(file, line, column)
+
+            if work_dir:
+                rel_path = os.path.relpath(path, work_dir)
+                position = MessagePosition(rel_path, line, column, work_dir)
+            else:
+                position = MessagePosition(path, line, column, None)
 
             level = group[0]
             message = group[5]
@@ -80,7 +87,12 @@ class CheckMessage(object):
         获取表达式形式
         :return: 表达式形式
         """
-        return r'<CheckMessage %s, %s, message: "%s">' % (self.level, self.type, self.message)
+        return r'<%s %s, %s, message: "%s">' % (
+            type(self).__name__,
+            self.level,
+            self.type,
+            self.message
+        )
 
     @property
     def origin(self):
@@ -103,16 +115,18 @@ class MessagePosition(object):
     信息位置类
     """
 
-    def __init__(self, file, line, column=None):
+    def __init__(self, path, line, column=None, work_dir=None):
         """
         构造函数
-        :param file: 文件路径
+        :param path: 文件路径
         :param line: 起始行
         :param column: 结束行
+        :param work_dir: 工作路径
         """
-        self.__file = file
+        self.__path = path
         self.__line = line
         self.__column = column
+        self.__work_dir = work_dir
 
     @property
     def line(self):
@@ -131,12 +145,40 @@ class MessagePosition(object):
         return self.__column
 
     @property
-    def file(self):
+    def path(self):
         """
         获取文件路径
         :return: 文件路径
         """
-        return self.__file
+        return self.__path
+
+    @property
+    def work_dir(self):
+        """
+        获取工作路径
+        :return: 工作路径
+        """
+        return self.__work_dir
+
+    @work_dir.setter
+    def work_dir(self, work_dir):
+        """
+        设置工作路径
+        :param work_dir: 工作路径
+        :return: None
+        """
+        self.__work_dir = work_dir
+
+    @property
+    def abs_path(self):
+        """
+        获取绝对路径
+        :return: 绝对路径
+        """
+        if self.work_dir:
+            return os.path.normpath(os.path.join(self.work_dir, self.path))
+        else:
+            return self.path
 
     @property
     def position(self):
@@ -155,7 +197,7 @@ class MessagePosition(object):
         还原成原字符串
         :return: 原字符串
         """
-        return "%s:%s" % (self.file, self.position)
+        return "%s:%s" % (self.abs_path, self.position)
 
     def __str__(self):
         """
@@ -180,4 +222,8 @@ class MessagePosition(object):
         获取输出表达格式信息
         :return: 输出表达格式信息
         """
-        return "<MessagePosition %s, file: %s>" % (self.__full_position, self.file)
+        return "<%s %s, file: %s>" % (
+            type(self).__name__,
+            self.__full_position,
+            self.abs_path
+        )

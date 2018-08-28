@@ -27,10 +27,11 @@ class CheckStandard:
         """
         return self.__standard_file
 
-    def check(self, check_dir):
+    def check(self, check_dir, abs_path=False):
         """
         检查对应的路径（文件）
         :param check_dir: 检查的路径（文件）
+        :param abs_path: 使用绝对路径（默认为False）
         :return: 检查结果（list格式，内部包含CheckMessage对象）
         """
         out, err = execute(
@@ -40,7 +41,11 @@ class CheckStandard:
         )
         messages = []
         for line in out.splitlines():
-            message = CheckMessage.parse(line)
+            if abs_path:
+                work_dir = None
+            else:
+                work_dir = check_dir
+            message = CheckMessage.parse(line, work_dir)
             if message:
                 messages += [message]
         return messages
