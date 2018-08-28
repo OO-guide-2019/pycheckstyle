@@ -1,6 +1,7 @@
+import subprocess
+
 from ..config.execute import command_line_base as __command_line_base
 from ..exceptions import try_raise_execute
-import subprocess
 
 
 def execute(*args, ignore_return_code=False, ignore_stderr=False):
